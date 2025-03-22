@@ -22,7 +22,7 @@ class Hotel(models.Model):
     )
     hotel_name = models.CharField(max_length=2048)
     hotel_description = models.TextField()
-    hotel_email = models.EmailField(unique=True, default="abc@gmail.com")
+    hotel_email = models.EmailField(unique=True)
     hotel_phone = models.CharField(max_length=13, null=True, blank=True)
     hotel_owner = models.CharField(max_length=255)
     hotel_category = models.IntegerField(choices=HOTEL_CATEGORIES, default=HOTEL_CATEGORIES.ICY_YELLOW)
@@ -57,3 +57,40 @@ class HotelImages(models.Model):
     class Meta:
         managed = True
         verbose_name = _("Hotel Images")
+
+class Room(models.Model):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    ROOM_CATEGORIES = Choices(
+        (1,"ALPHA",_("Alpha")),
+        (2,"BETA",_("Beta")),
+        (3,"Gamma",_("Gamma")),
+    )
+    room_type = models.IntegerField(choices=ROOM_CATEGORIES, default=ROOM_CATEGORIES.ALPHA)
+    room_description = models.TextField()
+    room_price = models.IntegerField(default=0)
+    room_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"Room Description: {self.room_type}"
+    
+    class Meta:
+        managed = True
+        verbose_name = _("Hotel Room")
+        indexes = [
+            models.Index(fields=['hotel_id','room_type'])
+        ]
+
+class RoomAvailability(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    date = models.DateField()
+    rooms_available = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"Room Availabily: {self.date} -> {self.rooms_available}"
+    
+    class Meta:
+        managed = True
+        verbose_name = _("Room Availability")
+        indexes = [
+            models.Index(fields=['date'])
+        ]
