@@ -36,15 +36,14 @@ class HotelInputSerializer(serializers.ModelSerializer):
 
         for image_data in images_data:
             if image_data:
-                image = HotelImages.objects.create(image_url=image_data)
-                hotel.hotel_images.add(image)
+                HotelImages.objects.create(image_url=image_data,hotel=hotel)
                 
         return hotel
 
 
 class HotelOutputSerializer(serializers.ModelSerializer):
     hotel_amenities = HotelAmenitiesSerializer(many=True)
-    hotel_images = HotelImagesSerializer(many=True)
+    hotel_images = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
@@ -53,3 +52,9 @@ class HotelOutputSerializer(serializers.ModelSerializer):
             'hotel_city', 'hotel_state', 'hotel_longitude', 'hotel_latitude',
             'hotel_amenities', 'hotel_images', 'is_active', 'created_at', 'updated_at'
         ]
+
+    def get_hotel_images(self,obj):
+        images = HotelImages.objects.filter(hotel=obj).values_list("image_url",flat=True)
+        if images:
+            return list(images)
+        return []

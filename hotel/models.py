@@ -14,17 +14,6 @@ class HotelAmenities(models.Model):
         verbose_name = _('Hotel Amenity')
 
 
-class HotelImages(models.Model):
-    image_url = models.ImageField(upload_to='media/hotel')
-
-    def __str__(self):
-        return f"Image id:{self.id}"
-
-    class Meta:
-        managed = True
-        verbose_name = _("Hotel Images")
-
-
 class Hotel(models.Model):
     HOTEL_CATEGORIES = Choices(
         (1,"ICY_YELLOW",_("ICY YELLOW")),
@@ -43,7 +32,6 @@ class Hotel(models.Model):
     hotel_longitude = models.FloatField(verbose_name=_("Longitude"), null=True, blank=True, default=0.0)
     hotel_latitude = models.FloatField(verbose_name=_("Latitude"), null=True, blank=True, default=0.0)
     hotel_amenities = models.ManyToManyField(HotelAmenities)
-    hotel_images = models.ManyToManyField(HotelImages)
     HOTEL_ACTIVE = Choices(
         ("UNVERIFIED",_("Unverified")),
         ("VERIFIED",_("Verified")),
@@ -56,3 +44,16 @@ class Hotel(models.Model):
     class Meta:
         managed = True
         verbose_name = _("Hotels")
+
+
+class HotelImages(models.Model):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name="hotel_image")
+    image_url = models.ImageField(upload_to='media/hotel')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image id:{self.id}"
+
+    class Meta:
+        managed = True
+        verbose_name = _("Hotel Images")
