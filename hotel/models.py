@@ -22,8 +22,8 @@ class Hotel(models.Model):
     )
     hotel_name = models.CharField(max_length=2048)
     hotel_description = models.TextField()
-    hotel_email = models.EmailField(unique=True)
-    hotel_phone = models.CharField(max_length=13, null=True, blank=True)
+    hotel_email = models.EmailField(default='abc@gmail.com')
+    hotel_phone = models.CharField(unique=True,max_length=13)
     hotel_owner = models.CharField(max_length=255)
     hotel_category = models.IntegerField(choices=HOTEL_CATEGORIES, default=HOTEL_CATEGORIES.ICY_YELLOW)
     hotel_address = models.CharField(max_length=2048)
@@ -44,6 +44,10 @@ class Hotel(models.Model):
     class Meta:
         managed = True
         verbose_name = _("Hotels")
+        indexes = [
+            models.Index(fields=['hotel_phone']),
+            models.Index(fields=['id'])
+        ]
 
 
 class HotelImages(models.Model):
